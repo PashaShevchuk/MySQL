@@ -154,11 +154,11 @@ from application
 order by idApplication desc
 limit 5 offset 10;
 
-# 5. +Вивести усіх клієнтів, чиє прізвище закінчується на OV чи OVA.
+# 5. +Вивести усіх клієнтів, чиє прізвище закінчується на IV чи IVA.
 select *
 from client
-where LastName like '%ov'
-  and '%ova';
+where LastName like '%iv'
+  and '%iva';
 
 # 6. +Вивести клієнтів банку, які обслуговуються київськими відділеннями.
 select *
@@ -272,7 +272,14 @@ from application
 where Sum > (select Avg(Sum) from application);
 
 # /*Знайти клієнтів, які є з того самого міста, що і клієнт, який взяв найбільшу кількість кредитів*/
-
+select FirstName, LastName, City
+from client
+where City = (select c.City
+              from application a
+                       join client c on a.Client_idClient = c.idClient
+              group by Client_idClient
+              order by COUNT(idApplication) desc
+              limit 1);
 
 # /* місто чувака який набрав найбільше кредитів*/
 select FirstName, LastName, City, count(Client_idClient) as countCredit
@@ -289,6 +296,9 @@ set a.Sum      = 6000,
 where c.Education = 'high';
 
 # 18. Усіх клієнтів київських відділень пересилити до Києва.
+update client c join department d on c.Department_idDepartment = d.idDepartment
+set c.City = 'Kyiv'
+where d.DepartmentCity = 'Kyiv';
 
 # 19. Видалити усі кредити, які є повернені.
 delete
